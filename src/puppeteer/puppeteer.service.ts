@@ -162,7 +162,7 @@ export class PuppeteerService implements OnModuleDestroy {
         }
       } catch (err) {
         this.logger.error('Error during scrape/poll', err as any);
-        this.gateway.emitError('scrape_error', (err as any).message || String(err));
+        this.gateway.sendError(500, (err as any).message || String(err));
       }
       await new Promise((res) => setTimeout(res, this.monitorInterval));
     }
