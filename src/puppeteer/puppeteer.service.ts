@@ -45,9 +45,16 @@ export class PuppeteerService implements OnModuleDestroy {
     if (this.browser) return;
 
     this.logger.log('Launching browser...');
+		const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
+    this.browser = await puppeteer.launch({
+      headless: process.env.HEADLESS !== 'false',
+      executablePath,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    });
     
 		this.browser = await puppeteer.launch({
-      headless: process.env.HEADLESS !== 'false', // default: headless
+      headless: process.env.HEADLESS !== 'false',
+			executablePath, // default: headless
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
@@ -82,7 +89,7 @@ export class PuppeteerService implements OnModuleDestroy {
 	private async performLogin() {
 		if (!this.page) throw new Error('Page not initialized');
 		const loginUrl = 'https://www.avito.ru/profile';
-		await this.page.goto(loginUrl, { waitUntil: 'networkidle2' });
+		await this.page.goto(loginUrl, { waitUntil: 'domcontentloaded' });
 
 		try {
 			// try to click login link/button if present

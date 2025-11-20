@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { PuppeteerService } from './puppeteer/puppeteer.service';
 import { gracefulShutdown } from './helpers/shutdown';
 
 async function bootstrap() {
@@ -10,7 +11,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
   Logger.log(`app is running on: ${await app.getUrl()}`);
   
-  const puppeteerService = app.get('PuppeteerService', { strict: false });
+  const puppeteerService = app.get(PuppeteerService);
 
   gracefulShutdown(puppeteerService);
 }
