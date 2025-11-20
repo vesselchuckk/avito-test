@@ -20,7 +20,7 @@ export class MessagesGateway {
       },
     });
     this.httpServer.listen(port, () => {
-      this.logger.log(`server is listening on port ${port}`);
+      this.logger.log(`WS server is listening on port ${port}`);
     });
     this.io.on('connection', (socket) => {
       this.logger.log(`client connected: ${socket.id}`);
