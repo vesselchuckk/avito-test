@@ -59,7 +59,7 @@ export class PuppeteerService implements OnModuleDestroy {
 
 	private async login() {
 		if (!this.page) throw new Error('Page not initialized');
-		// Try to detect whether already logged in by visiting messages page
+
 		const messagesUrl = 'https://www.avito.ru/profile';
 		this.logger.log(`Checking login by opening ${messagesUrl}`);
 		await this.page.goto(messagesUrl, { waitUntil: 'networkidle2' });
@@ -92,15 +92,14 @@ export class PuppeteerService implements OnModuleDestroy {
 			// wait for login form
 			await new Promise((res) => setTimeout(res, 1000)); // wait a bit
 
-			// Try to fill credentials
+			// try to fill credentials
 			const login = process.env.AVITO_LOGIN;
 			const password = process.env.AVITO_PASSWORD;
 			if (!login || !password) {
 				throw new Error('AVITO_LOGIN or AVITO_PASSWORD environment variables are not set');
 			}
 
-			// Example selectors — adapt if Avito UI differs
-			// Input for login (phone/email)
+			// cred input
 			const loginSelector = 'input[name="login"]';
 			const passwordSelector = 'input[name="password"]';
 			// fallback selectors
@@ -114,7 +113,7 @@ export class PuppeteerService implements OnModuleDestroy {
 			await this.page.type(ls, login, { delay: 50 });
 			await this.page.type(ps, password, { delay: 50 });
 
-			// Click submit
+			// submit
 			const submitBtn = await this.page.$('button[type="submit"], button[data-marker="submit-button"]');
 			if (submitBtn) {
 				await Promise.all([this.page.waitForNavigation({ waitUntil: 'networkidle2' }), submitBtn.click()]);
@@ -141,7 +140,7 @@ export class PuppeteerService implements OnModuleDestroy {
 
 	  private async openMsgPage() {
     if (!this.page) throw new Error('Page not initialized');
-    // Open messages page
+    
     const messagesUrl = 'https://www.avito.ru/profile/messages';
     await this.page.goto(messagesUrl, { waitUntil: 'networkidle2' });
 
@@ -171,13 +170,13 @@ export class PuppeteerService implements OnModuleDestroy {
 
 	  private async scrapeNewMessages(): Promise<MonitoredMessage[]> {
     if (!this.page) throw new Error('Page not initialized');
-    // Evaluate DOM to collect latest messages — adapt selectors to Avito DOM.
-    // We'll try to find messages list items, their sender name, body, timestamp, and a message id.
+    
+    // try to find messages list items, their sender name, body, timestamp, and a message id.
     const targetName = process.env.AVITO_TARGET_NAME || 'Рушан';
     const res = await this.page.evaluate(
       (targetName) => {
         const out: Array<{ id: string; from: string; body: string; date: string }> = [];
-        // Heuristic: conversation elements have data-item or items with [data-marker="item"]
+        // conversation elements have data-item or items with [data-marker="item"]
         const convs = Array.from(document.querySelectorAll('[data-marker="seller-contacts-item"], [data-marker^="conversation-"], .conversation, .msg-list__item'));
         if (convs.length === 0) {
           // fallback: try to select message blocks
