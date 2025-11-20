@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { MonitoredMessage } from './types/puppeteer.types';
+import { MessagesGateway } from '../gateway/gateway.gateway';
 
 @Injectable()
 export class PuppeteerService implements OnModuleDestroy {
@@ -13,7 +14,7 @@ export class PuppeteerService implements OnModuleDestroy {
 	private monitorInterval = (process.env.MONITOR_INTERVAL || 5000) as number;
 	private seenMsgID = new Set<string>();
 
-	constructor(private readonly gateway: MessageGateway) {}
+	constructor(private readonly gateway: MessagesGateway) {}
 
 	async start() {
 		if (this.monitoring) return;
